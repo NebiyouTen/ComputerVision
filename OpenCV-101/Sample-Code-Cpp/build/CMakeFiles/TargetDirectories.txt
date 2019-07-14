@@ -1,3 +1,0 @@
-/Users/nyismaw/Desktop/PersonalProjects/OpenCV/Course/OpenCV-101/Sample-Code-Cpp/build/CMakeFiles/rebuild_cache.dir
-/Users/nyismaw/Desktop/PersonalProjects/OpenCV/Course/OpenCV-101/Sample-Code-Cpp/build/CMakeFiles/edit_cache.dir
-/Users/nyismaw/Desktop/PersonalProjects/OpenCV/Course/OpenCV-101/Sample-Code-Cpp/build/CMakeFiles/sampleCode.dir
