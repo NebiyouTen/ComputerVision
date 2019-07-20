@@ -32,17 +32,9 @@ def main(argv):
     enhanced_brightness = enhance_brightness(image_boy, 50)
     # display images
     display_image(image_boy)
-    # display_image(enhanced_contrast)
+    display_image(enhanced_contrast)
     display_image(enhanced_brightness)
-    brightnessOffset = 50
-    brightHighInt32 = np.int32(image_boy)+brightnessOffset
-    brightHighInt32Clipped = np.clip(brightHighInt32,0,255)
-    print (type(brightHighInt32Clipped))
-    cv2.imshow("Int32 Clipped",brightHighInt32Clipped.astype(np.uint8))
-    cv2.waitKey()
-    cv2.destroyAllWindows()
 
-    print (image_boy[0,0], enhanced_brightness[0,0])
 
 if __name__ == '__main__':
     main(sys.argv)
