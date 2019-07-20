@@ -5,7 +5,11 @@ PROJECT(sampleCode)
 ######################## EDIT IF REQUIRED ####################
 ###Uncomment the line below and specify the path to OpenCV directory i.e. the path to the OpenCVConfig.cmake file. Check the examples given below.
 
-SET(OpenCV_DIR /home/nyismaw/Desktop/Personal_Study/OpenCV/installation/OpenCV-4.1.0/lib/cmake/opencv4/)
+#### path on my MAC /Users/nyismaw/Desktop/PersonalProjects/OpenCV/installation/OpenCV-4.1.0/
+#### path on my Ubuntu
+#### Add paths to env var instead of hard coding em
+#### need to activate c++ std11 on my mac set (CMAKE_CXX_STANDARD 11)
+SET(OpenCV_DIR /Users/nyismaw/Desktop/PersonalProjects/OpenCV/installation/OpenCV-4.1.0/lib/cmake/opencv4/)
 
 ################### OpenCV_DIR Examples  #####################
 
