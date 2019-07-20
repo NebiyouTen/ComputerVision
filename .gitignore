@@ -1,1 +1,6 @@
+# ignore build files
 build/
+# ignore zip files
+*.zip
+# ignore data files
+data/
