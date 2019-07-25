@@ -57,7 +57,8 @@ def main(argv):
                 # Break the loop
             else:
                 break
-
+    cap.release()
+    cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main(sys.argv)

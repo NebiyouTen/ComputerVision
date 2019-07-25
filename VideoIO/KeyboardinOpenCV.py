@@ -46,6 +46,8 @@ def main(argv):
                 cv2.imshow("Frame", frame)
             else:
                 break
+    cap.release()
+    cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
