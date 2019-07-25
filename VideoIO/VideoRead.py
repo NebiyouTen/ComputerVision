@@ -16,6 +16,16 @@ import matplotlib
 matplotlib.rcParams['figure.figsize'] = (6.0, 6.0)
 matplotlib.rcParams['image.cmap'] = 'gray'
 
+def print_video_properties(cap):
+    '''
+        This function will get video properties from a capture object and
+        prints them.
+    '''
+    # get width of frames the video
+    width  = cap.get(cv2.CAP_PROP_FRAME_WIDTH)
+    height = cap.get(cv2.CAP_PROP_FRAME_HEIGHT)
+    print ("Video resolution is %dx%d" %(width, height))
+
 '''
     @main
 '''
@@ -25,6 +35,8 @@ def main(argv):
     # Check if camera opened successfully
     if (cap.isOpened()== False):
         print("Error opening video stream or file")
+    # print video properties
+    print_video_properties(cap)
     # while capture object is opened
     while(cap.isOpened()):
       # Capture frame-by-frame
