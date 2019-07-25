@@ -1,7 +1,7 @@
 '''
     Author: Nebiyou Yismaw
 
-    This is a python code that will explore the use kebyoards in OPenCV
+    This is a python code that will explore the use keyboards in OPenCV
 
 
 '''
