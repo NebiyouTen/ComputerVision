@@ -6,3 +6,7 @@ build/
 # ignore data files
 data/
 OpenCV-101/Sample-Code-Cpp/build/
+# video and image files
+*.jpb
+*.png
+*.mp4
