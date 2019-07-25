@@ -35,22 +35,23 @@ def main(argv):
     # Check if camera opened successfully
     if (cap.isOpened()== False):
         print("Error opening video stream or file")
-    # print video properties
-    print_video_properties(cap)
-    # while capture object is opened
-    while(cap.isOpened()):
-      # Capture frame-by-frame
-      ret, frame = cap.read()
-      if ret == True:
-          # Display the resulting frame
-          cv2.imshow('Frame',frame)
-          # Press esc on keyboard to  exit
-          # wait take time to wait before timing out in ms. Here we wait for
-          # 25ms before displaying the next frame
-          if cv2.waitKey(25) & 0xFF == 27:
+    else: # if capture object is opened successfully
+        # print video properties
+        print_video_properties(cap)
+        # while capture object is opened
+        while(cap.isOpened()):
+          # Capture frame-by-frame
+          ret, frame = cap.read()
+          if ret == True:
+              # Display the resulting frame
+              cv2.imshow('Frame',frame)
+              # Press esc on keyboard to  exit
+              # wait take time to wait before timing out in ms. Here we wait for
+              # 25ms before displaying the next frame
+              if cv2.waitKey(25) & 0xFF == 27:
+                  break
+          else:
               break
-      else:
-          break
 
 
 if __name__ == '__main__':
