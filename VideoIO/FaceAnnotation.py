@@ -87,8 +87,6 @@ def face_annotate(action, x, y, flags, userdata):
 '''
     @main
 '''
-
-
 def main(argv):
     # get image source
     src_img = cv2.imread("sample.jpg", 1)
