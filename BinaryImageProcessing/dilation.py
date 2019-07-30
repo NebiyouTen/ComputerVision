@@ -43,11 +43,11 @@ def main(argv):
     cv2.imshow("kernel 3x3", kernel_2.astype(float))
     cv2.waitKey()
     # apply multile dilations on an input image
-    imageDilated_1 = cv2.dilate(img_to_dilate, kernel_2, iterations=1)
-    cv2.imshow("Dilated image 2", imageDilated_1)
+    image_dilated_1 = cv2.dilate(img_to_dilate, kernel_2, iterations=1)
+    cv2.imshow("Dilated image 2", image_dilated_1)
     cv2.waitKey()
-    imageDilated_2 = cv2.dilate(img_to_dilate, kernel_2, iterations=2)
-    cv2.imshow("Dilated image 3", imageDilated_2)
+    image_dilated_2 = cv2.dilate(img_to_dilate, kernel_2, iterations=2)
+    cv2.imshow("Dilated image 3", image_dilated_2)
     cv2.waitKey()
     # destory windows
     cv2.destroyAllWindows()
