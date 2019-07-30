@@ -51,8 +51,6 @@ def threshold_using_vectors(src, thresh, maxValue):
 '''
     @main
 '''
-
-
 def main(argv):
     # Read an image in grayscale
     src = cv2.imread("threshold.png", cv2.IMREAD_GRAYSCALE)
