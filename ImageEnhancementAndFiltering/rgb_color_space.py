@@ -22,10 +22,10 @@ matplotlib.rcParams['image.cmap'] = 'gray'
 def main(argv):
     # read the RGB image
     rgb_image = cv2.imread("capsicum.jpg")
-    cv2.imshow("RGB image ",rgb_image[:,:,::-1])
+    cv2.imshow("RGB image ",rgb_image)
     cv2.waitKey()
     # now let's split the channels and view all of them
-    r, g, b = cv2.split(rgb_image)
+    b, g, r = cv2.split(rgb_image)
     cv2.imshow("R-channel ",r)
     cv2.waitKey()
     cv2.imshow("G-channel ",g)
@@ -38,7 +38,7 @@ def main(argv):
         each channel. All the three channels have brightness and color information.
         Color component is knows as Chrominance, brightness info is known as
         Luminance. Other color space might have these inforation in a separate
-        channels. 
+        channels.
     '''
 
 
