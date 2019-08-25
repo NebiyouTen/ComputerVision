@@ -12,6 +12,9 @@
 
 '''
 
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 
 def get_lap_app_kernel():
     '''
