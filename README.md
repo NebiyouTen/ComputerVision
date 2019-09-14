@@ -1,5 +1,5 @@
-# OpenCV 
+# Computer Vision 
 
-### This repo contains OpenCV codes and example projects in C++ and Python.
+### This repo contains implementaitons of different computer vision concepts, papers and projects. 
 
 
