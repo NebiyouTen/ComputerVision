@@ -26,7 +26,7 @@ def main(argv):
     # Extract the three channels from the gray scale image
     # and merge the three channels into one color image
     im_color = np.zeros((height,width,3), dtype=np.uint8 )
-    for i in range(0,3) :
+    for i in range(0,3):
         im_color[:,:,i] = im[ i * height:(i+1) * height,:]
     blue = im_color[:,:,0]
     green = im_color[:,:,1]
