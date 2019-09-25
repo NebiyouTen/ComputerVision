@@ -1,5 +1,5 @@
 # Computer Vision 
 
-### This repo contains implementaitons of different computer vision concepts, papers and projects. 
+### This repo contains implementaitons of various computer vision concepts, problems, papers, and projects. 
 
 
