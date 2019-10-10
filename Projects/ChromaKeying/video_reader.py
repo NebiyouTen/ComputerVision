@@ -39,13 +39,14 @@ def main(argv):
         # print video properties
         print_video_properties(cap)
         # while capture object is opened
+        i = 0
         while(cap.isOpened()):
           # Capture frame-by-frame
           ret, frame = cap.read()
           if ret == True:
               # Display the resulting frame
               cv2.imshow('Frame',frame)
-              cv2.imwrite("greenscreen-demo.jpg", frame)
+              cv2.imwrite("greenscreen-demo_{}.jpg".format(i), frame)
               # Press esc on keyboard to  exit
               # wait take time to wait before timing out in ms. Here we wait for
               # 25ms before displaying the next frame
@@ -54,7 +55,9 @@ def main(argv):
 
           else:
               break
-          break
+          if i > 0:
+              break
+          i += 1
     cap.release()
     cv2.destroyAllWindows()
 
