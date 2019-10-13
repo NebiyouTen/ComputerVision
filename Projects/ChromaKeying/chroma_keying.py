@@ -8,52 +8,91 @@
 import sys
 import cv2
 import numpy as np
+import time
 
 # let's define global variables
-input_img_1 = []
-input_img_2 = []
-backing_color_1_xy = []
-backing_color_2_xy = []
-backing_color_index = 0
+backing_color_1_xy = None
+cb = [1,0,0]
+beta = 0.5
+tolerance = 100
+smoothness = 18
+defringe = 18
+maxScaleUp = 100
 
-def compute_alpha():
+
+
+'''
+    A function that will normaliz an image so that the pixels will be in the [0, 255]
+    range and will return a unit8 version
+'''
+def normalize_img(image):
+    return np.uint8( 255 *  (image - np.min(image)) / (np.max(image) - np.min(image)) )
+
+def compute_alpha(input_img_1):
     '''
 
     '''
 
     global backing_color_1_xy
-    global backing_color_2_xy
-    global backing_color_index
-    global input_img
-    x,y = backing_color_1_xy
-    cf_1 = np.ones_like(input_img) * input_img[x,y]
-    x,y = backing_color_2_xy
-    cf_2 = np.ones_like(input_img) * input_img[x,y]
+    global tolerance
+    global smoothness
+    global defringe
 
+    img_ycrcb = cv2.cvtColor(input_img_1, cv2.COLOR_BGR2YCR_CB).astype(np.float64)
 
+    x, y = backing_color_1_xy
+    cr_k, cb_k = img_ycrcb[x, y, 1:]
 
-    print ( cf_1[0,0,:])
-    print ( cf_2[0,0,:])
+    dis = np.sum((img_ycrcb[:, :, 1:] - img_ycrcb[x, y, 1:][None,None,:])**2, axis=-1)
+
+    alpha = np.zeros_like(dis).astype(np.float64)
+
+    tol_low =  max(tolerance / 100 * dis.max(), 10)
+    alpha[dis > tol_low] = 1#(dis[dis > tol_low] - tol_low) / (dis.max() - tol_low)
+
+    return alpha
+
+def get_new_img(src_img, alpha):
+    '''
+
+    '''
+    global backing_color_1_xy
+
+    x, y = backing_color_1_xy
+    src_img = (src_img.astype(np.float64) - src_img.min()) / ( src_img.max() - src_img.min() )
+    alpha = (1-alpha)[:,:,None]
+    co = src_img - alpha * src_img[x, y, :]
+    co[co<0] = 0
+    c = co + alpha * cb
+    print ("co",co.max(), co.min())
+    return normalize_img(c)
+
 
 def callback(action, y, x, flags, userdata):
     '''
         Mouse event callback function
     '''
     global backing_color_1_xy
-    global backing_color_2_xy
-    global backing_color_index
-    global input_img
     # if mouse button is pressed
     if action == cv2.EVENT_LBUTTONDOWN:
-        # get all the candidate patches
-        if backing_color_index:
-            backing_color_2_xy = [x,y]
-            print ("selecting second backing color ", backing_color_2_xy)
-            compute_alpha()
-        else:
-            backing_color_1_xy = [x,y]
-            print ("selecting first backing color ", backing_color_1_xy)
-        backing_color_index = (backing_color_index + 1) % 2
+        backing_color_1_xy = [x, y]
+
+
+def get_track_bar_data(val, type):
+    '''
+
+    '''
+    global tolerance
+    global smoothness
+    global defringe
+    if type == 0:
+        tolerance = val
+    elif type == 1:
+        smoothness = val
+    else:
+        defringe = val
+    print ("Values are ",tolerance, smoothness, defringe, val, type )
+
 
 
 
@@ -61,31 +100,51 @@ def main(argv):
     '''
         @main
     '''
-    global backing_color_1_xy
-    global backing_color_2_xy
-    global input_img
-    input_img = cv2.imread("greenscreen-demo.jpg")
-    input_img_cpy = input_img.copy()
-    print (input_img.shape)
+    global backing_color_1_xy, tolerance, smoothness, defringe
     # crete a named window
     cv2.namedWindow("Window", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('Window', input_img.shape[0]//2, input_img.shape[0]//2)
+    cv2.resizeWindow(
+        'Window', 720, 720)
+    cv2.putText(None,'''Click anywhere to pick a color''' ,
+                (10,30), cv2.FONT_HERSHEY_SIMPLEX,
+                1,(255,255,255), 2 );
     # let's add mouse event handler for our named window
-    cv2.setMouseCallback("Window", callback, input_img)
-    # exit if esc key is pressed
-    k = 0
-    while k != 27:
-        cv2.imshow("Window", input_img)
-        cv2.putText(input_img, 'Press ESC to exit and c to clear',
-                    (10, 30), cv2.FONT_HERSHEY_SIMPLEX,
-                    0.7, (0, 0, 0), 2)
-        # wait for key
-        k = cv2.waitKey(20) & 0xFF
-        # if key c is pressed, create the a copy of the original image and
-        # pass that to the mouse event callback, which has no circles drawn
-        # on it
-        if k == 99:
-            input_img = input_img_cpy.copy()
+    cv2.setMouseCallback("Window", callback, None)
+    # create a video capture object by passing a file name
+    cap = cv2.VideoCapture('greenscreen-demo.mp4')
+    cv2.createTrackbar("Tolerance", "Window",
+                       tolerance, maxScaleUp, lambda x: get_track_bar_data(x, 0))
+    cv2.createTrackbar("Smoothness", "Window",
+                       smoothness, maxScaleUp, lambda x: get_track_bar_data(x, 1))
+    cv2.createTrackbar("Defringe", "Window",
+                      defringe, maxScaleUp, lambda x: get_track_bar_data(x, 2))
+    # Check if camera opened successfully
+    if (cap.isOpened()== False):
+        print("Error opening video stream or file")
+    else: # if capture object is opened successfully
+        # while capture object is opened
+        i = 0
+        while(cap.isOpened()):
+          # Capture frame-by-frame
+          ret, input_img_1 = cap.read()
+          if ret == True:
+              if backing_color_1_xy is not None:
+                  alpha = compute_alpha(input_img_1)
+                  img = get_new_img(input_img_1, alpha)
+                  cv2.putText(img,'''Click anywhere to pick a color''' ,
+                              (10,30), cv2.FONT_HERSHEY_SIMPLEX,
+                              1.5,(123,53,202), 2 );
+                  cv2.imshow('Window', img)
+
+              else:
+                  cv2.putText(input_img_1,'''Click anywhere to pick a color''' ,
+                              (10,30), cv2.FONT_HERSHEY_SIMPLEX,
+                              1.5,(123,53,202), 2 );
+                  cv2.imshow('Window',input_img_1)
+              if cv2.waitKey(25) & 0xFF == 27:
+                  break
+              # Display the resulting frame
+
     # destroy windows
     cv2.destroyAllWindows()
 
