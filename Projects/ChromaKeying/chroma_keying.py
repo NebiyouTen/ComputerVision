@@ -12,12 +12,13 @@ import time
 
 # let's define global variables
 backing_color_1_xy = None
-cb = [1,0,0]
+cb = [0,0,0]
 beta = 0.5
-tolerance = 100
-smoothness = 18
+tolerance = 0
+smoothness = 1
 defringe = 18
 maxScaleUp = 100
+maxScaleUp_smooth = 50
 
 
 
@@ -25,8 +26,12 @@ maxScaleUp = 100
     A function that will normaliz an image so that the pixels will be in the [0, 255]
     range and will return a unit8 version
 '''
-def normalize_img(image):
+def convert_to_uint8(image):
     return np.uint8( 255 *  (image - np.min(image)) / (np.max(image) - np.min(image)) )
+
+
+def normalzie_0_1(image):
+    return ( image.astype(np.float32)  - image.min()) / (np.max(image) - np.min(image))
 
 def compute_alpha(input_img_1):
     '''
@@ -47,25 +52,46 @@ def compute_alpha(input_img_1):
 
     alpha = np.zeros_like(dis).astype(np.float64)
 
-    tol_low =  max(tolerance / 100 * dis.max(), 10)
-    alpha[dis > tol_low] = 1#(dis[dis > tol_low] - tol_low) / (dis.max() - tol_low)
+    tol_low =  5 / 50 * dis.max()
+    tol_high = max( 6, tolerance )  / 50 * dis.max()
+    if tol_high > dis.max():
+        tol_low += tol_high - dis.max()
+        tol_high = dis.max() + 1
+    near_regions = np.logical_and(tol_low < dis, dis < tol_high)
+    alpha[ near_regions ] = (dis[ near_regions ] - tol_low) / (tol_high - tol_low)
+    alpha[dis > tol_high] = 1
 
     return alpha
+
+def blur_mask(alpha):
+    '''
+        Function to blur mask
+    '''
+    global smoothness
+    # gaussian blurring
+    return cv2.GaussianBlur(alpha, (2*smoothness+1, 2*smoothness+1), 0,0)
+
 
 def get_new_img(src_img, alpha):
     '''
 
     '''
     global backing_color_1_xy
+    global cb
 
     x, y = backing_color_1_xy
-    src_img = (src_img.astype(np.float64) - src_img.min()) / ( src_img.max() - src_img.min() )
-    alpha = (1-alpha)[:,:,None]
-    co = src_img - alpha * src_img[x, y, :]
-    co[co<0] = 0
-    c = co + alpha * cb
-    print ("co",co.max(), co.min())
-    return normalize_img(c)
+    src_img = normalzie_0_1(src_img)
+
+    alpha_blur = blur_mask(alpha)
+    alpha = (alpha * alpha_blur )
+
+    alpha = (1 - alpha)[:,:,None]
+
+    co = src_img - alpha * src_img
+    co[ co < 0 ] = 0
+    c =  co + alpha * np.random.random(3)
+
+    return convert_to_uint8(c)
 
 
 def callback(action, y, x, flags, userdata):
@@ -91,9 +117,6 @@ def get_track_bar_data(val, type):
         smoothness = val
     else:
         defringe = val
-    print ("Values are ",tolerance, smoothness, defringe, val, type )
-
-
 
 
 def main(argv):
@@ -115,9 +138,9 @@ def main(argv):
     cv2.createTrackbar("Tolerance", "Window",
                        tolerance, maxScaleUp, lambda x: get_track_bar_data(x, 0))
     cv2.createTrackbar("Smoothness", "Window",
-                       smoothness, maxScaleUp, lambda x: get_track_bar_data(x, 1))
-    cv2.createTrackbar("Defringe", "Window",
-                      defringe, maxScaleUp, lambda x: get_track_bar_data(x, 2))
+                       smoothness, maxScaleUp_smooth, lambda x: get_track_bar_data(x, 1))
+    # cv2.createTrackbar("Defringe", "Window",
+    #                   defringe, maxScaleUp, lambda x: get_track_bar_data(x, 2))
     # Check if camera opened successfully
     if (cap.isOpened()== False):
         print("Error opening video stream or file")
