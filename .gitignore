@@ -12,3 +12,4 @@ OpenCV-101/Sample-Code-Cpp/build/
 *.mp4
 *.avi
 *.jpeg
+*models*
